@@ -1,0 +1,46 @@
+import Quartz
+import numpy as np
+
+NAME = 'モンスト'
+ORIGIN_X = 55
+ORIGIN_Y = 72
+
+class Window:
+    id = 0
+
+    def __init__(self):
+        self.id = self.get_id()
+        
+    def get_id(self):
+        windows = Quartz.CGWindowListCopyWindowInfo(Quartz.kCGWindowListOptionOnScreenOnly | Quartz.kCGWindowListExcludeDesktopElements, Quartz.kCGNullWindowID)
+        # print([w['kCGWindowName'] for w in windows])
+        window = [w for w in windows if w['kCGWindowName'] == NAME]
+        # print(window)
+        return window[0]['kCGWindowNumber']
+
+    def capture(self):
+        image = Quartz.CGWindowListCreateImage(
+            Quartz.CGRectMake(55, 72, 480, 788),
+            Quartz.kCGWindowListOptionIncludingWindow,
+            self.id,
+            Quartz.kCGWindowImageBoundsIgnoreFraming | Quartz.kCGWindowImageNominalResolution
+        )
+
+        # bytes_per_row = Quartz.CGImageGetBytesPerRow(image)
+        # width = Quartz.CGImageGetWidth(image)
+        # height = Quartz.CGImageGetHeight(image)
+
+        image_data_provider = Quartz.CGImageGetDataProvider(image)
+        image_data = Quartz.CGDataProviderCopyData(image_data_provider)
+
+        np_data_buffer = np.frombuffer(image_data, dtype=np.uint8)
+
+        np_data = np_data_buffer.reshape((788, 480, 4))
+        # np_data = np.lib.stride_tricks.as_strided(
+        #     np_data_buffer,
+        #     shape=(height, width, 3),
+        #     strides=(bytes_per_row, 4, 1),
+        #     writeable=False
+        # )
+        
+        return np_data
