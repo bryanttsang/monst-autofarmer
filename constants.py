@@ -1,0 +1,3 @@
+NAME = 'モンスト'
+ORIGIN_X = 55
+ORIGIN_Y = 72

@@ -1,10 +1,7 @@
 import Quartz
+from constants import NAME
 import numpy as np
 from time import sleep
-
-NAME = 'モンスト'
-ORIGIN_X = 55
-ORIGIN_Y = 72
 
 class Window:
     id = 0
@@ -46,18 +43,19 @@ class Window:
         
         return np_data
     
-    def click(self, coord: tuple):
-        Quartz.CGEventPost(Quartz.kCGHIDEventTap, 
-            Quartz.CGEventCreateMouseEvent(None, Quartz.kCGEventLeftMouseDown, coord, Quartz.kCGMouseButtonLeft))
-        sleep(0.015)
-        Quartz.CGEventPost(Quartz.kCGHIDEventTap, 
-            Quartz.CGEventCreateMouseEvent(None, Quartz.kCGEventLeftMouseUp, coord, Quartz.kCGMouseButtonLeft))
-        sleep(0.015)
+    def click(self, coord: tuple, n: int = 1):
+        for _ in range(n):
+            Quartz.CGEventPost(Quartz.kCGHIDEventTap, 
+                Quartz.CGEventCreateMouseEvent(None, Quartz.kCGEventLeftMouseDown, coord, Quartz.kCGMouseButtonLeft))
+            sleep(0.015)
+            Quartz.CGEventPost(Quartz.kCGHIDEventTap, 
+                Quartz.CGEventCreateMouseEvent(None, Quartz.kCGEventLeftMouseUp, coord, Quartz.kCGMouseButtonLeft))
+            sleep(0.015)
 
-    def drag(self, down: tuple, up: tuple):
+    def drag(self, down: tuple, up: tuple, delay: int = 0.015):
         Quartz.CGEventPost(Quartz.kCGHIDEventTap, 
             Quartz.CGEventCreateMouseEvent(None, Quartz.kCGEventLeftMouseDown, down, Quartz.kCGMouseButtonLeft))
-        sleep(0.015)
+        sleep(delay)
         Quartz.CGEventPost(Quartz.kCGHIDEventTap, 
             Quartz.CGEventCreateMouseEvent(None, Quartz.kCGEventLeftMouseDragged, up, Quartz.kCGMouseButtonLeft))
         sleep(0.015)
