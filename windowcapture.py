@@ -1,5 +1,5 @@
 import Quartz
-from constants import NAME
+from constants import NAME, SUB
 import numpy as np
 from time import sleep
 
@@ -12,7 +12,7 @@ class Window:
     def get_id(self):
         windows = Quartz.CGWindowListCopyWindowInfo(Quartz.kCGWindowListOptionOnScreenOnly | Quartz.kCGWindowListExcludeDesktopElements, Quartz.kCGNullWindowID)
         # print([w['kCGWindowName'] for w in windows])
-        window = [w for w in windows if w['kCGWindowName'] == NAME]
+        window = [w for w in windows if w['kCGWindowName'] in (NAME, SUB)]
         # print(window)
         return window[0]['kCGWindowNumber']
 
@@ -52,7 +52,7 @@ class Window:
                 Quartz.CGEventCreateMouseEvent(None, Quartz.kCGEventLeftMouseUp, coord, Quartz.kCGMouseButtonLeft))
             sleep(0.015)
 
-    def drag(self, down: tuple, up: tuple, delay: int = 0.015):
+    def drag(self, down: tuple, up: tuple, delay: float = 0.015):
         Quartz.CGEventPost(Quartz.kCGHIDEventTap, 
             Quartz.CGEventCreateMouseEvent(None, Quartz.kCGEventLeftMouseDown, down, Quartz.kCGMouseButtonLeft))
         sleep(delay)

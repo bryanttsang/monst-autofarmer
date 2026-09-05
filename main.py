@@ -1,32 +1,27 @@
-from windowcapture import Window
-from imagesearch import image_search
-from templates import homescreen, pick_team, ok_skip
-from constants import ORIGIN_X, ORIGIN_Y
-from time import sleep
+import subprocess
+import os
+from signal import SIGSTOP, SIGCONT, SIGTERM
+from pynput import keyboard
 
-wincap = Window()
+script = 'farm.py'
+paused = False
 
-# detect if at homescreen
-if not image_search(homescreen, wincap.capture(), (87, 611)):
-    exit(0)
+process = subprocess.Popen(["python3", script])
+pid = process.pid
 
-while True:
-    # shortcut button
-    wincap.click((300, 640), 2)
+def on_hotkey(key):
+    global paused
 
-    # start quest
-    while not (loc := image_search(pick_team, wincap.capture()[:,210:244])):
-        sleep(0.5)
-    wincap.click((295, loc[1]+ORIGIN_Y), 5)
+    if key == keyboard.Key.f1:
+        if paused:
+            os.kill(pid, SIGCONT)
+        else:
+            os.kill(pid, SIGSTOP)
+        paused = not paused
 
-    # finish level
-    while not (loc := image_search(ok_skip, wincap.capture(), (219, 739))):
-        wincap.click((295, 567))
-        wincap.drag((295, 567), (195, 470)) # 45 deg
-        sleep(0.5)
-    wincap.click((loc[0]+ORIGIN_X, loc[1]+ORIGIN_Y))
+    if key == keyboard.Key.f2:
+        os.kill(pid, SIGTERM)
+        exit(0)
 
-    # wait for homescreen
-    while not image_search(homescreen, wincap.capture(), (87, 611)):
-        sleep(1)
-    sleep(1) # wait to fully load
+with keyboard.Listener(on_press=on_hotkey) as listener:
+    listener.join()
