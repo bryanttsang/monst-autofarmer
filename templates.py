@@ -1,7 +1,9 @@
-import cv2 as cv
+from cv2 import imread, IMREAD_GRAYSCALE
+from numpy import uint8
 
-homescreen = cv.imread("templates/homescreen.png", cv.IMREAD_GRAYSCALE)
-no_stam = cv.imread("templates/nostam.png", cv.IMREAD_GRAYSCALE)
-no_stam_ok = cv.imread("templates/nostamok.png", cv.IMREAD_GRAYSCALE)
-pick_team = cv.imread("templates/pickteam.png", cv.IMREAD_GRAYSCALE)
-ok_skip = cv.imread("templates/okskip.png", cv.IMREAD_GRAYSCALE)
+homescreen = imread("templates/homescreen.png", IMREAD_GRAYSCALE).astype(uint8)
+no_stam = imread("templates/nostam.png", IMREAD_GRAYSCALE).astype(uint8)
+pick_team = imread("templates/pickteam.png", IMREAD_GRAYSCALE).astype(uint8)
+ok_clear = imread("templates/okclear.png", IMREAD_GRAYSCALE).astype(uint8)
+ok_skip = imread("templates/okskip.png", IMREAD_GRAYSCALE).astype(uint8)
+loadscreen = imread("templates/loadscreen.png", IMREAD_GRAYSCALE).astype(uint8)
