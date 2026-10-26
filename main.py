@@ -1,14 +1,17 @@
+import sys
 import subprocess
 import os
 from signal import SIGSTOP, SIGCONT, SIGTERM
 from pynput import keyboard
 
-script = 'farm.py'
+script = f'{sys.argv[1]}.py' if len(sys.argv) > 1 else 'farm.py'
 paused = False
 
 process = subprocess.Popen(["python3", script])
 pid = process.pid
 
+# F1 - pause/resume
+# F2 - stop
 def on_hotkey(key):
     global paused
 
