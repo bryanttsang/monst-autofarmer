@@ -1,64 +1,47 @@
+# type: ignore[attr-defined]
 import Quartz
-from constants import NAME, SUB
-import numpy as np
+from constants import WINDOW_WIDTH, WINDOW_HEIGHT
+from numpy import frombuffer, uint8
 from time import sleep
 
+screen_bounds = Quartz.CGRectMake(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT)
+list_option = Quartz.kCGWindowListOptionOnScreenOnly
+window_ID = Quartz.kCGNullWindowID
+image_option = Quartz.kCGWindowImageBoundsIgnoreFraming | Quartz.kCGWindowImageNominalResolution
+_CGWindowListCreateImage = Quartz.CGWindowListCreateImage
+_CGDataProviderCopyData = Quartz.CGDataProviderCopyData
+_CGImageGetDataProvider = Quartz.CGImageGetDataProvider
+
+kCGHIDEventTap = Quartz.kCGHIDEventTap
+kCGEventLeftMouseDown = Quartz.kCGEventLeftMouseDown
+kCGEventLeftMouseUp = Quartz.kCGEventLeftMouseUp
+kCGEventLeftMouseDragged = Quartz.kCGEventLeftMouseDragged
+kCGMouseButtonLeft = Quartz.kCGMouseButtonLeft
+_CGEventPost = Quartz.CGEventPost
+_CGEventCreateMouseEvent = Quartz.CGEventCreateMouseEvent
+
 class Window:
-    id = 0
-
-    def __init__(self):
-        self.id = self.get_id()
-        
-    def get_id(self):
-        windows = Quartz.CGWindowListCopyWindowInfo(Quartz.kCGWindowListOptionOnScreenOnly | Quartz.kCGWindowListExcludeDesktopElements, Quartz.kCGNullWindowID)
-        # print([w['kCGWindowName'] for w in windows])
-        window = [w for w in windows if w['kCGWindowName'] in (NAME, SUB)]
-        # print(window)
-        return window[0]['kCGWindowNumber']
-
     def capture(self):
-        image = Quartz.CGWindowListCreateImage(
-            Quartz.CGRectMake(55, 72, 480, 788),
-            Quartz.kCGWindowListOptionIncludingWindow,
-            self.id,
-            Quartz.kCGWindowImageBoundsIgnoreFraming | Quartz.kCGWindowImageNominalResolution
-        )
-
-        # bytes_per_row = Quartz.CGImageGetBytesPerRow(image)
-        # width = Quartz.CGImageGetWidth(image)
-        # height = Quartz.CGImageGetHeight(image)
-
-        image_data_provider = Quartz.CGImageGetDataProvider(image)
-        image_data = Quartz.CGDataProviderCopyData(image_data_provider)
-
-        np_data_buffer = np.frombuffer(image_data, dtype=np.uint8)
-
-        np_data = np_data_buffer.reshape((788, 480, 4))
-        # np_data = np.lib.stride_tricks.as_strided(
-        #     np_data_buffer,
-        #     shape=(height, width, 3),
-        #     strides=(bytes_per_row, 4, 1),
-        #     writeable=False
-        # )
-        
-        return np_data
+        image = _CGWindowListCreateImage(screen_bounds, list_option, window_ID, image_option)
+        image_data = _CGDataProviderCopyData(_CGImageGetDataProvider(image))
+        return frombuffer(image_data, dtype=uint8).reshape((WINDOW_HEIGHT, WINDOW_WIDTH, 4))
     
     def click(self, coord: tuple, n: int = 1):
         for _ in range(n):
-            Quartz.CGEventPost(Quartz.kCGHIDEventTap, 
-                Quartz.CGEventCreateMouseEvent(None, Quartz.kCGEventLeftMouseDown, coord, Quartz.kCGMouseButtonLeft))
+            _CGEventPost(kCGHIDEventTap, 
+                _CGEventCreateMouseEvent(None, kCGEventLeftMouseDown, coord, kCGMouseButtonLeft))
             sleep(0.015)
-            Quartz.CGEventPost(Quartz.kCGHIDEventTap, 
-                Quartz.CGEventCreateMouseEvent(None, Quartz.kCGEventLeftMouseUp, coord, Quartz.kCGMouseButtonLeft))
+            _CGEventPost(kCGHIDEventTap, 
+                _CGEventCreateMouseEvent(None, kCGEventLeftMouseUp, coord, kCGMouseButtonLeft))
             sleep(0.015)
 
     def drag(self, down: tuple, up: tuple, delay: float = 0.015):
-        Quartz.CGEventPost(Quartz.kCGHIDEventTap, 
-            Quartz.CGEventCreateMouseEvent(None, Quartz.kCGEventLeftMouseDown, down, Quartz.kCGMouseButtonLeft))
+        _CGEventPost(kCGHIDEventTap, 
+            _CGEventCreateMouseEvent(None, kCGEventLeftMouseDown, down, kCGMouseButtonLeft))
         sleep(delay)
-        Quartz.CGEventPost(Quartz.kCGHIDEventTap, 
-            Quartz.CGEventCreateMouseEvent(None, Quartz.kCGEventLeftMouseDragged, up, Quartz.kCGMouseButtonLeft))
+        _CGEventPost(kCGHIDEventTap, 
+            _CGEventCreateMouseEvent(None, kCGEventLeftMouseDragged, up, kCGMouseButtonLeft))
         sleep(0.015)
-        Quartz.CGEventPost(Quartz.kCGHIDEventTap, 
-            Quartz.CGEventCreateMouseEvent(None, Quartz.kCGEventLeftMouseUp, up, Quartz.kCGMouseButtonLeft))
+        _CGEventPost(kCGHIDEventTap, 
+            _CGEventCreateMouseEvent(None, kCGEventLeftMouseUp, up, kCGMouseButtonLeft))
         sleep(0.015)
