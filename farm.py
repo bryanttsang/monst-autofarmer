@@ -37,9 +37,11 @@ while True:
 
     # finish level
     while not (ok_skip_button := image_search(ok_skip, wincap.capture(), OKSKIP_SEARCH)):
-        wincap.click((257, 470))
-        wincap.drag((257, 470), (157, 370), 0.475) # 45 deg
-        # wincap.drag((257, 470), (157, 370)) # no gauge
+        wincap.click(STAGECLEAR_BUTTON)
+        wincap.drag(STAGECLEAR_BUTTON, (157, 370), 0.475) # 45 deg
+        # wincap.drag(STAGECLEAR_BUTTON, (157, 370)) # no gauge
+        wincap.click(CONNECTIONERROR_BUTTON)
+        wincap.click(CONNECTIONRETRY_BUTTON)
         sleep(0.5)
     wincap.click(ok_skip_button)
 

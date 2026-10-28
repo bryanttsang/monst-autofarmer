@@ -2,8 +2,7 @@ from windowcapture import Window
 from imagesearch import image_search, area_search
 from templates import *
 from constants import *
-from time import sleep, time
-from datetime import datetime
+from time import sleep
 
 # ワンワン ゼーレ コロンブス ラファエル
 
@@ -14,9 +13,9 @@ if not image_search(homescreen, wincap.capture(), HOMESCREEN_SEARCH):
     print('not at homescreen')
     exit(0)
 
+WP_SEARCH = (149, 170, 272, 296)
 WP_LEFT = (184, 260)
 WP_TOP = (239, 205)
-timer = open(f'timer/light{datetime.now().strftime("%Y%m%d%H%M")}', 'w', buffering=1, encoding='utf-8')
 
 while True:
     wincap.click(SHORTCUT_BUTTON, 2)
@@ -51,20 +50,22 @@ while True:
     # b3
     while not image_search(light_t3, wincap.capture(), (249, 627)):
         sleep(0.5)
-    for _ in range(10):
-        if area_search(light_wp_left, wincap.capture(), (149, 170, 272, 296)):
+    for _ in range(69):
+        if area_search(light_wp_left, wincap.capture(), WP_SEARCH):
             wp = WP_TOP
             break
-        if area_search(light_wp_top, wincap.capture(), (149, 170, 272, 296)):
+        if area_search(light_wp_top, wincap.capture(), WP_SEARCH):
             wp = WP_LEFT
             break
-    for _ in range(10):
+    for _ in range(69):
         wincap.drag(wp, (294, 482))
 
     # finish level
     while not (ok_skip_button := image_search(ok_skip, wincap.capture(), OKSKIP_SEARCH)):
-        wincap.click((257, 470))
-        wincap.drag((257, 470), (157, 370))
+        wincap.click(STAGECLEAR_BUTTON)
+        wincap.drag(STAGECLEAR_BUTTON, (157, 370))
+        wincap.click(CONNECTIONERROR_BUTTON)
+        wincap.click(CONNECTIONRETRY_BUTTON)
         sleep(0.5)
     wincap.click(ok_skip_button)
 
@@ -73,9 +74,6 @@ while True:
         wincap.click(ML_BUTTON)
         wincap.click(ok_skip_button)
         sleep(0.5)
-
-    # mark time
-    timer.write(str(time()) + '\n')
 
     # wait for homescreen
     while not image_search(homescreen, wincap.capture(), HOMESCREEN_SEARCH):

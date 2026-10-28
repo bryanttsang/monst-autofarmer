@@ -48,8 +48,10 @@ while True:
 
     # finish level
     while not (ok_skip_button := image_search(ok_skip, wincap.capture(), OKSKIP_SEARCH)):
-        wincap.click((257, 470))
+        wincap.click(STAGECLEAR_BUTTON)
         wincap.drag((88, 390), (294, 525))
+        wincap.click(CONNECTIONERROR_BUTTON)
+        wincap.click(CONNECTIONRETRY_BUTTON)
     wincap.click(ok_skip_button)
 
     # exit reward screen
